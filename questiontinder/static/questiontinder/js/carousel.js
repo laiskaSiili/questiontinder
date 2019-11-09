@@ -10,6 +10,10 @@ class Carousel {
         // add first two cards programmatically
         this.push()
         this.push()
+        this.push()
+        this.push()
+        this.push()
+        this.push()
         // handle gestures
         this.handle()
     }
@@ -26,6 +30,8 @@ class Carousel {
         if (this.cards.length > 0) {
             // set default top card position and scale
             this.topCard.style.transform = 'translateX(-50%) translateY(-50%) rotate(0deg) rotateY(0deg) scale(1)'
+            // get overlay
+            this.topCardOverlay = this.topCard.querySelector('.card-overlay')
             // destroy previous Hammer instance, if present
             if (this.hammer) this.hammer.destroy()
             // listen for tap and pan gestures on top card
@@ -59,6 +65,7 @@ class Carousel {
             this.isPanning = true
             // remove transition properties
             this.topCard.style.transition = null
+            this.topCardOverlay.style.transition = null
             if (this.nextCard) this.nextCard.style.transition = null
             // get top card coordinates in pixels
             let style = window.getComputedStyle(this.topCard)
@@ -83,6 +90,19 @@ class Carousel {
         let deg = this.isDraggingFrom * dirX * Math.abs(propX) * 45
         // calculate scale ratio, between 95 and 100 %
         let scale = (95 + (5 * Math.abs(propX))) / 100
+        // set classes and opacity of thumbs overlay based on
+        if (e.deltaX < 0 && !this.topCardOverlay.classList.contains('fa-thumbs-down')) {
+            this.topCardOverlay.classList.remove('fa-thumbs-up')
+            this.topCardOverlay.classList.remove('green')
+            this.topCardOverlay.classList.add('fa-thumbs-down')
+            this.topCardOverlay.classList.add('red')
+        } else if (e.deltaX > 0 && !this.topCardOverlay.classList.contains('fa-thumbs-up')) {
+            this.topCardOverlay.classList.add('fa-thumbs-up')
+            this.topCardOverlay.classList.add('green')
+            this.topCardOverlay.classList.remove('fa-thumbs-down')
+            this.topCardOverlay.classList.remove('red')
+        }
+        this.topCardOverlay.style.opacity = Math.min(0.75, Math.abs(propX) * 2)
         // move top card
         this.topCard.style.transform = 'translateX(' + posX + 'px) translateY(' + posY + 'px) rotate(' + deg + 'deg) rotateY(0deg) scale(1)'
         // scale next card
@@ -103,10 +123,6 @@ class Carousel {
                 successful = true
                 // get left border position
                 posX = - (this.board.clientWidth + this.topCard.clientWidth)
-            } else if (propY < -0.25 && e.direction == Hammer.DIRECTION_UP) {
-                successful = true
-                // get top border position
-                posY = - (this.board.clientHeight + this.topCard.clientHeight)
             }
 
             if (successful) {
@@ -125,6 +141,8 @@ class Carousel {
             } else {
                 // reset cards position
                 this.topCard.style.transform = 'translateX(-50%) translateY(-50%) rotate(0deg) rotateY(0deg) scale(1)'
+                this.topCardOverlay.style.transition = 'opacity 200ms ease-out'
+                this.topCardOverlay.style.opacity = 0
                 if (this.nextCard) this.nextCard.style.transform = 'translateX(-50%) translateY(-50%) rotate(0deg) rotateY(0deg) scale(0.95)'
             }
         }
@@ -134,6 +152,12 @@ class Carousel {
         let card = document.createElement('div')
         card.classList.add('card')
         card.style.backgroundImage = "url('https://picsum.photos/320/320/?random=" + Math.round(Math.random() * 1000000) + "')"
+        // create thumbs overlay elements
+        let thumbsUpOverlay = document.createElement('i')
+        thumbsUpOverlay.className = 'card-overlay far fa-10x'
+        thumbsUpOverlay.style.opacity = 0
+        card.appendChild(thumbsUpOverlay)
+
         if (this.board.firstChild) {
             this.board.insertBefore(card, this.board.firstChild)
         } else {
