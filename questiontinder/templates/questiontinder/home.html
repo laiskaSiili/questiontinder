@@ -1,0 +1,19 @@
+{% extends 'questiontinder/base.html' %}
+{% load static %}
+
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'questiontinder/css/home.css' %}">
+{% endblock %}
+
+
+{% block js %}
+<script src="{% static 'questiontinder/js/hammer.min.js' %}"></script>
+<script src="{% static 'questiontinder/js/carousel.js' %}"></script>
+<script src="{% static 'questiontinder/js/home.js' %}"></script>
+{% endblock %}
+
+{% block main %}
+<div id="board">
+</div>
+{% endblock %}
