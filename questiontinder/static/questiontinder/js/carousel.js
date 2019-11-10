@@ -6,16 +6,13 @@ class Carousel {
 
     constructor(element) {
 
+        let jsVariables = JSON.parse(document.getElementById('jsVariables').textContent);
+        this.voteQuestionUrl = jsVariables['vote_questions_url']
+        this.fetchQuestionsUrl = jsVariables['fetch_questions_url']
+
         this.board = element
-        // add first two cards programmatically
-        this.push()
-        this.push()
-        this.push()
-        this.push()
-        this.push()
-        this.push()
-        // handle gestures
-        this.handle()
+        // fetch questions
+        this.fetchNewQuestions()
     }
 
     handle() {
@@ -102,7 +99,7 @@ class Carousel {
             this.topCardOverlay.classList.remove('fa-thumbs-down')
             this.topCardOverlay.classList.remove('red')
         }
-        this.topCardOverlay.style.opacity = Math.min(0.75, Math.abs(propX) * 2)
+        this.topCardOverlay.style.opacity = Math.min(0.75, Math.abs(propX))
         // move top card
         this.topCard.style.transform = 'translateX(' + posX + 'px) translateY(' + posY + 'px) rotate(' + deg + 'deg) rotateY(0deg) scale(1)'
         // scale next card
@@ -111,31 +108,42 @@ class Carousel {
         if (e.isFinal) {
             this.isPanning = false
             let successful = false
+            let upvoteFlag = false
             // set back transition properties
             this.topCard.style.transition = 'transform 200ms ease-out'
             if (this.nextCard) this.nextCard.style.transition = 'transform 100ms linear'
             // check threshold
             if (propX > 0.25 && e.direction == Hammer.DIRECTION_RIGHT) {
                 successful = true
+                upvoteFlag = true
                 // get right border position
                 posX = this.board.clientWidth
             } else if (propX < -0.25 && e.direction == Hammer.DIRECTION_LEFT) {
                 successful = true
+                upvoteFlag = false
                 // get left border position
                 posX = - (this.board.clientWidth + this.topCard.clientWidth)
             }
 
             if (successful) {
+
+                let question_id = this.topCard.id.split('_')[1]
+                if (!question_id.startsWith('dummy')) {
+                    this.voteQuestion(question_id, upvoteFlag)
+                }
+
                 // throw card in the chosen direction
                 this.topCard.style.transform = 'translateX(' + posX + 'px) translateY(' + posY + 'px) rotate(' + deg + 'deg)'
+
                 // wait transition end
                 setTimeout(() => {
                     // remove swiped card
                     this.board.removeChild(this.topCard)
-                    // add new card
-                    this.push()
-                    // handle gestures on new top card
-                    this.handle()
+                    if (this.cards === undefined || this.cards.length < 3) {
+                        this.fetchNewQuestions()
+                    } else {
+                        this.handle()
+                    }
                 }, 200)
 
             } else {
@@ -148,20 +156,81 @@ class Carousel {
         }
     }
 
-    push() {
-        let card = document.createElement('div')
-        card.classList.add('card')
-        card.style.backgroundImage = "url('https://picsum.photos/320/320/?random=" + Math.round(Math.random() * 1000000) + "')"
-        // create thumbs overlay elements
-        let thumbsUpOverlay = document.createElement('i')
-        thumbsUpOverlay.className = 'card-overlay far fa-10x'
-        thumbsUpOverlay.style.opacity = 0
-        card.appendChild(thumbsUpOverlay)
-
-        if (this.board.firstChild) {
-            this.board.insertBefore(card, this.board.firstChild)
-        } else {
-            this.board.append(card)
+    post(url, payload, successCallback, errorCallback) {
+        let csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value
+        let options = {
+            method: 'POST',
+            body: JSON.stringify(payload),
+            headers: new Headers(),
+            credentials: 'same-origin',
         }
+        options.headers.append('X-CSRFToken', csrfToken)
+        options.headers.append('X-Requested-With', 'XMLHttpRequest')
+        options.headers.append('Content-Type', 'application/json; charset=UTF-8')
+
+        fetch(url, options)
+        .then(function(response) {
+            return response.json()
+        })
+        .then(successCallback)
+        .catch(errorCallback);
+    }
+
+    voteQuestion(questionId, upvoteFlag) {
+        let payload = {
+            'question_id': questionId,
+            'upvote_flag': upvoteFlag,
+        }
+        this.post(this.voteQuestionUrl, payload, this.displaySuccess.bind(this), this.displayError.bind(this))
+    }
+
+    fetchNewQuestions() {
+        this.post(this.fetchQuestionsUrl, {}, this.addQuestionsToBoard.bind(this), this.displayError.bind(this))
+    }
+
+    displayError(error) {
+        console.log('ERROR')
+        console.log(error)
+    }
+
+    displaySuccess(response) {
+        console.log('SUCCESS')
+        console.log(response)
+    }
+
+    addQuestionsToBoard(response) {
+        let questions = response['questions']
+        if (questions.length == 0) {
+            questions.push({
+                'id':'dummy' + Math.floor(Math.random() * 1000),
+                'question': 'There are currently no more questions to swipe. Try again a little later or add one of your own!'
+            })
+            questions.push({
+                'id':'dummy' + Math.floor(Math.random() * 1000),
+                'question': 'There are currently no more questions to swipe. Try again a little later or add one of your own!'
+            })
+        }
+        for (let i=0; i<questions.length; i++) {
+            let question = questions[i];
+
+            let card = document.createElement('div')
+            card.className = 'card p-4'
+            card.textContent = question.question
+            card.id = 'question_' + question.id
+
+            // create thumbs overlay elements
+            let thumbsUpOverlay = document.createElement('i')
+            thumbsUpOverlay.className = 'card-overlay far fa-10x'
+            thumbsUpOverlay.style.opacity = 0
+            card.appendChild(thumbsUpOverlay)
+
+            if (this.board.firstChild) {
+                this.board.insertBefore(card, this.board.firstChild)
+            } else {
+                this.board.append(card)
+            }
+        }
+        // handle gestures
+        this.handle()
     }
 }

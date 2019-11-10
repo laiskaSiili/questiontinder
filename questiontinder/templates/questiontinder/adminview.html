@@ -1,0 +1,15 @@
+{% extends 'questiontinder/base.html' %}
+{% load static %}
+
+{% block main %}
+<div class="container">
+    <div class="row">
+        <div class="col-12 my-3">
+            <form action="" method="post">
+                {% csrf_token %}
+                <button class="btn btn-danger p-2" type="submit" name="reset">Reset</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

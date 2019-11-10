@@ -1,0 +1,17 @@
+{% extends 'questiontinder/base.html' %}
+{% load static %}
+
+{% block main %}
+<div class="container">
+    <div class="row">
+        <div class="col my-3">
+            <div class="mb-3text-center alert alert-success">
+                <h3>Thank you</h3>
+                <p>Your question was added. You may continue rating the questions of others or ask more yourself!</p>
+            </div>
+            <a class="btn btn-primary p-2 w-100" href="{% url 'swipe' %}">Continue</a>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
