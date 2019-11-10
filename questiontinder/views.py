@@ -74,12 +74,13 @@ class ApiVoteQuestion(View):
         upvote_flag = request_data['upvote_flag']
         questions_voted_id = request.session.get('questions_voted_id', [])
         questions_voted_id_set = set(questions_voted_id)
-        if upvote_flag and question_id not in questions_voted_id:
-            question = Question.objects.get(id=question_id)
-            question.votes += 1
-            question.save()
-        request.session['questions_voted_id'] = questions_voted_id + [question_id]
-        request.session.set_expiry(3600)
+        if question_id not in questions_voted_id:
+            request.session['questions_voted_id'] = questions_voted_id + [question_id]
+            request.session.set_expiry(3600)
+            if upvote_flag:
+                question = Question.objects.get(id=question_id)
+                question.votes += 1
+                question.save()
 
         data = {
             'status': 'OK',
