@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, reverse
 from django.http import JsonResponse
 from django.views import View
 from django.contrib.sessions.models import Session
-from .forms import QuestionAddForm
+from .forms import QuestionAddForm, TopicDropdownForm
 from .models import Question
 from random import shuffle
 import json
@@ -103,14 +103,18 @@ class AdminView(View):
         return redirect('swipe')
 
 
-class Overview(View):
+class Wordcloud(View):
 
     def get(self, request):
         ctx = {}
-        return render(request, 'questiontinder/overview.html', ctx)
+        ctx['topic_dropdown'] = TopicDropdownForm()
+        return render(request, 'questiontinder/wordcloud.html', ctx)
 
     def post(self, request):
-        questions = list(Question.objects.all().order_by('-votes').values('question', 'votes')[:10])
+        request_data = json.loads(request.body)
+        topic_id = int(request_data.get('topic_id'))
+        questions = list(Question.objects.all().filter(topic_id=topic_id).order_by('-votes').values('question', 'votes'))
+        questions = [{'text': q['question'], 'size': q['votes']} for q in questions]
         data = {
             'status': 'OK',
             'questions': questions,

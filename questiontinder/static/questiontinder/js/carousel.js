@@ -187,7 +187,7 @@ class Carousel {
             'question_id': questionId,
             'upvote_flag': upvoteFlag,
         }
-        this.post(this.voteQuestionUrl, payload, this.displaySuccess.bind(this), this.displayError.bind(this))
+        this.post(this.voteQuestionUrl, payload, displaySuccess, displayError)
     }
 
     fetchNewQuestions(clearPrefetched) {
@@ -195,17 +195,7 @@ class Carousel {
         let data = {
             'clear_prefetched': clearPrefetched
         }
-        this.post(this.fetchQuestionsUrl, data, this.fetchNewQuestionsSuccess.bind(this), this.displayError.bind(this))
-    }
-
-    displayError(error) {
-        console.log('ERROR')
-        console.log(error)
-    }
-
-    displaySuccess(response) {
-        if (this.verbose) console.log('SUCCESS')
-        if (this.verbose) console.log(response)
+        this.post(this.fetchQuestionsUrl, data, this.fetchNewQuestionsSuccess.bind(this), displayError)
     }
 
     addLastCard() {

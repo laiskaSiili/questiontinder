@@ -1,6 +1,16 @@
 from django import forms
 from .models import Question
 
+
+class TopicDropdownForm(forms.ModelForm):
+
+    class Meta:
+        model = Question
+        fields = ('topic',)
+        labels = {
+            'topic': '',
+        }
+
 class QuestionAddForm(forms.ModelForm):
 
     class Meta:

@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import Swipe, AddQuestion, Thanks, ApiGetQuestions, AdminView, ApiVoteQuestion, Overview
+from .views import Swipe, AddQuestion, Thanks, ApiGetQuestions, AdminView, ApiVoteQuestion, Wordcloud, Control
 
 urlpatterns = [
     path('', Swipe.as_view(), name='swipe'),
@@ -8,5 +8,5 @@ urlpatterns = [
     path('api/getquestions', ApiGetQuestions.as_view(), name='api_getquestions'),
     path('api/votequestion', ApiVoteQuestion.as_view(), name='api_votequestion'),
     path('admin', AdminView.as_view(), name='admin_view'),
-    path('overview', Overview.as_view(), name='overview'),
+    path('wordcloud', Wordcloud.as_view(), name='wordcloud'),
 ]

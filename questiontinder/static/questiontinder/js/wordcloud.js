@@ -10,6 +10,21 @@ var bbox = container.getBoundingClientRect()
 var width = bbox.width
 var height = bbox.height
 
+document.querySelector('#topic-dropdown select').addEventListener('change', function(e) {
+    let topic_id = e.target.options[e.target.selectedIndex].value
+    if (topic_id) {
+        post('', {'topic_id': topic_id}, updateWordcloud, displayError)
+    } else {
+        myWordCloud.update([])
+    }
+})
+
+function updateWordcloud(response) {
+    let questions = response['questions']
+    console.log(questions)
+    myWordCloud.update(questions)
+}
+
 function wordCloud(selector) {
 
     var fill = d3.scale.category20();
@@ -94,23 +109,3 @@ function getWords() {
 
 //Create a new instance of the word cloud visualisation.
 var myWordCloud = wordCloud('#wordcloud');
-
-//Start cycling through the demo data
-//showNewWords(myWordCloud);
-
-var words = getWords()
-myWordCloud.update(words)
-
-setTimeout(function() {
-    words[4].size += 20
-    words[6].size += 5
-    words[2].size += 10
-    myWordCloud.update(words)
-}, 3000)
-
-setTimeout(function() {
-    words.push({'text': 'Hello there beautifures hereux!', 'size':40})
-    words.push({'text': 'skdjk dskjkas jlkdjsalkd slkadsa!', 'size':40})
-    words.push({'text': 'Hello there hereux!', 'size':12})
-    myWordCloud.update(words)
-}, 6000)

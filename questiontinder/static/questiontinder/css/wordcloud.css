@@ -1,0 +1,11 @@
+#wordcloud {
+    width: 100%;
+    height: 80vh;
+}
+
+#topic-dropdown {
+    position: absolute;
+    right: 30px;
+    top: 30px;
+    z-index: 2;
+}
