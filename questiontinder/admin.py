@@ -1,3 +1,11 @@
 from django.contrib import admin
+from .models import Question, Topic
 
-# Register your models here.
+class QuestionAdmin(admin.ModelAdmin):
+    pass
+
+class TopicAdmin(admin.ModelAdmin):
+    pass
+
+admin.site.register(Question, QuestionAdmin)
+admin.site.register(Topic, TopicAdmin)
