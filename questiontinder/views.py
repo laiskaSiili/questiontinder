@@ -47,16 +47,17 @@ class Thanks(View):
 class ApiGetQuestions(View):
 
     def post(self, request):
-        questions_received_id = request.session.get('questions_received_id', [])
-        questions = list(Question.objects.all().values('id', 'question'))
-        if questions_received_id:
-            questions_ids = set(question['id'] for question in questions)
-            questions_received_id_set = set(questions_received_id)
-            questions = [question for question in questions if question['id'] not in questions_received_id_set]
-        questions = questions[:20]
+        request_data = json.loads(request.body)
+        questions_voted_ids = request.session.get('questions_voted_ids', [])
+        prefetched_questions_ids = request.session.get('prefetched_questions_ids', [])
+        if request_data.get('clear_prefetched'):
+            prefetched_questions_ids = []
+        to_exclude = prefetched_questions_ids + questions_voted_ids
+        questions = list(Question.objects.all().exclude(id__in=to_exclude).exclude(topic__frozen=True).values('id', 'question'))
+        questions = questions[:10]
         shuffle(questions)
 
-        request.session['questions_received_id'] = questions_received_id + [question['id'] for question in questions]
+        request.session['prefetched_questions_ids'] = prefetched_questions_ids + [question['id'] for question in questions]
         request.session.set_expiry(3600)
 
         data = {
@@ -72,10 +73,10 @@ class ApiVoteQuestion(View):
         request_data = json.loads(request.body)
         question_id = int(request_data['question_id'])
         upvote_flag = request_data['upvote_flag']
-        questions_voted_id = request.session.get('questions_voted_id', [])
-        questions_voted_id_set = set(questions_voted_id)
-        if question_id not in questions_voted_id:
-            request.session['questions_voted_id'] = questions_voted_id + [question_id]
+        questions_voted_ids = request.session.get('questions_voted_ids', [])
+        questions_voted_ids_set = set(questions_voted_ids)
+        if question_id not in questions_voted_ids:
+            request.session['questions_voted_ids'] = questions_voted_ids + [question_id]
             request.session.set_expiry(3600)
             if upvote_flag:
                 question = Question.objects.get(id=question_id)
