@@ -120,3 +120,18 @@ class Wordcloud(View):
             'questions': questions,
         }
         return JsonResponse(data)
+
+
+class Control(View):
+
+    def get(self, request):
+        ctx = {}
+        return render(request, 'questiontinder/control.html', ctx)
+
+    def post(self, request):
+        questions = list(Question.objects.all().select_related('topic__name').order_by('-votes').values_list('votes','question', 'topic__name', 'id'))
+        data = {
+            'status': 'OK',
+            'data': questions,
+        }
+        return JsonResponse(data)

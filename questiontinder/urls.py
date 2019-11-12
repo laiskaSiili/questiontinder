@@ -9,4 +9,5 @@ urlpatterns = [
     path('api/votequestion', ApiVoteQuestion.as_view(), name='api_votequestion'),
     path('admin', AdminView.as_view(), name='admin_view'),
     path('wordcloud', Wordcloud.as_view(), name='wordcloud'),
+    path('control', Control.as_view(), name='control'),
 ]

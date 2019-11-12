@@ -1,0 +1,43 @@
+{% extends 'questiontinder/base.html' %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/css/bootstrap.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.20/css/dataTables.bootstrap4.min.css">
+{% endblock %}
+
+{% block js %}
+
+<!-- Resources -->
+<script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+<script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js"></script>
+<!-- local -->
+<script src="{% static 'questiontinder/js/utils.js' %}"></script>
+<script src="{% static 'questiontinder/js/control.js' %}"></script>
+{% endblock %}
+
+
+{% block main %}
+{% csrf_token %}
+
+<div class="container">
+    <div class="row my-3">
+        <div class="col">
+            <table id="questions-datatable" class="table table-striped table-bordered" style="width:100%">
+                <thead>
+                    <tr>
+                        <th>Votes</th>
+                        <th>Questions</th>
+                        <th>Topic</th>
+                        <th>Id</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
