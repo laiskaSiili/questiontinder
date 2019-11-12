@@ -90,14 +90,14 @@ class Carousel {
         // set classes and opacity of thumbs overlay based on
         if (e.deltaX < 0 && !this.topCardOverlay.classList.contains('fa-thumbs-down')) {
             this.topCardOverlay.classList.remove('fa-thumbs-up')
-            this.topCardOverlay.classList.remove('green')
+            this.topCardOverlay.classList.remove('color-thumbsup')
             this.topCardOverlay.classList.add('fa-thumbs-down')
-            this.topCardOverlay.classList.add('red')
+            this.topCardOverlay.classList.add('color-thumbsdown')
         } else if (e.deltaX > 0 && !this.topCardOverlay.classList.contains('fa-thumbs-up')) {
             this.topCardOverlay.classList.add('fa-thumbs-up')
-            this.topCardOverlay.classList.add('green')
+            this.topCardOverlay.classList.add('color-thumbsup')
             this.topCardOverlay.classList.remove('fa-thumbs-down')
-            this.topCardOverlay.classList.remove('red')
+            this.topCardOverlay.classList.remove('color-thumbsdown')
         }
         this.topCardOverlay.style.opacity = Math.min(0.75, Math.abs(propX))
         // move top card

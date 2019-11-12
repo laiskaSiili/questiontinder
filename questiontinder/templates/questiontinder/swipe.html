@@ -3,23 +3,20 @@
 
 
 {% block css %}
-<link rel="stylesheet" href="{% static 'questiontinder/css/home.css' %}">
+<link rel="stylesheet" href="{% static 'questiontinder/css/swipe.css' %}">
 {% endblock %}
 
 
 {% block js %}
 <script src="{% static 'questiontinder/js/hammer.min.js' %}"></script>
 <script src="{% static 'questiontinder/js/carousel.js' %}"></script>
-<script src="{% static 'questiontinder/js/home.js' %}"></script>
+<script src="{% static 'questiontinder/js/swipe.js' %}"></script>
 {% endblock %}
 
 {% block main %}
-<div class="container">
-    <div class="row">
-        <div class="col-12 py-3 px-2">
-            <a class="btn btn-primary w-100 p-2" href="{% url 'addquestion' %}">Add question</a>
-        </div>
-    </div>
+<div id="add-question-container" class="w-100 d-flex flex-column align-items-center">
+    <a class="btn btn-light p-2 w-50" href="{% url 'addquestion' %}">Add question</a>
+    <p class="text-light mt-3"><i class="fas fa-angle-left"></i> <i class="fas fa-thumbs-down"></i> swipe to rate <i class="fas fa-thumbs-up"></i> <i class="fas fa-angle-right"></i></p>
 </div>
 <div id="board"></div>
 
