@@ -100,3 +100,18 @@ class AdminView(View):
             Session.objects.all().delete()
             #Question.objects.all().delete()
         return redirect('swipe')
+
+
+class Overview(View):
+
+    def get(self, request):
+        ctx = {}
+        return render(request, 'questiontinder/overview.html', ctx)
+
+    def post(self, request):
+        questions = list(Question.objects.all().order_by('-votes').values('question', 'votes')[:10])
+        data = {
+            'status': 'OK',
+            'questions': questions,
+        }
+        return JsonResponse(data)
