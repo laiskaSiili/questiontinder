@@ -21,7 +21,7 @@
         <div class="mb-3 col-12">
             <form action="" method="post">
                 {% csrf_token %}
-                {{ add_form.question|as_crispy_field }}
+                {{ add_form|crispy }}
                 <button class="btn btn-primary p-2 w-100" type="submit">Submit question</button>
             </form>
         </div>
