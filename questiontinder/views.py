@@ -114,7 +114,7 @@ class Wordcloud(View):
         request_data = json.loads(request.body)
         topic_id = int(request_data.get('topic_id'))
         questions = list(Question.objects.all().filter(topic_id=topic_id).order_by('-votes').values('question', 'votes'))
-        questions = [{'text': q['question'], 'size': q['votes']} for q in questions]
+        # questions = [{'text': q['question'], 'size': q['votes']} for q in questions]
         data = {
             'status': 'OK',
             'questions': questions,

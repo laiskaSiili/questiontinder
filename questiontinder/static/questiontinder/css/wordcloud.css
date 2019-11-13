@@ -1,6 +1,6 @@
 #wordcloud {
-    width: 100%;
-    height: 80vh;
+    width: 100vw;
+    height: 100vh;
 }
 
 #topic-dropdown {
@@ -9,3 +9,25 @@
     top: 30px;
     z-index: 2;
 }
+
+/*
+@media (min-width: 300px) {
+    #wordcloud svg { font-size: 12px; }
+}
+
+@media (min-width: 500px) {
+    #wordcloud svg { font-size: 20px; }
+}
+
+@media (min-width: 720px) {
+    #wordcloud svg { font-size: 28px; }
+}
+
+@media (min-width: 1200px) {
+    #wordcloud svg { font-size: 36px; }
+}
+
+@media (min-width: 1400px) {
+    #wordcloud svg { font-size: 42px; }
+}
+*/
