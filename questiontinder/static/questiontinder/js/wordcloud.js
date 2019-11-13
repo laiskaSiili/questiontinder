@@ -13,6 +13,7 @@ var refreshIntervallMs = 5000
 var maxFontsizePx = width / 20
 var questions
 var myWordCloud = wordCloud('#wordcloud')
+showDummyQuestions()
 
 document.getElementById('text_plus').addEventListener('click', function(e) {
     maxFontsizePx += 5;
@@ -41,9 +42,30 @@ document.querySelector('#topic-dropdown select').addEventListener('change', func
         post('', {'topic_id': topicId}, processResponse, displayError)
         startPeriodicRefresh()
     } else {
-        myWordCloud.update([])
+        showDummyQuestions()
     }
 })
+
+function showDummyQuestions() {
+    topicId = 8118
+    questions = [{
+        'question': 'I am about forty beautiful characters long.',
+        'votes': 5
+    },
+    {
+        'question': 'Use us to calibrate the font size.',
+        'votes': 4
+    },
+    {
+        'question': 'You should see 4 texts in total!',
+        'votes': 3
+    },
+    {
+        'question': 'Im minimal size.',
+        'votes': 1
+    }]
+    updateWordcloud(questions)
+}
 
 function startPeriodicRefresh() {
     refreshIntervallHandler = setInterval(function() {
@@ -62,7 +84,7 @@ function updateWordcloud(questions) {
 
     let maxVotes = Math.max.apply(Math, questions.map(function(item) { return item.votes; }))
     let minVotes = Math.min.apply(Math, questions.map(function(item) { return item.votes; }))
-    fontSizeScale = d3.scale.linear().domain([minVotes,maxVotes]).range([0.1, 1]);
+    fontSizeScale = d3.scale.linear().domain([minVotes,maxVotes]).range([0.3, 1]);
 
     let wordcloudData = []
     for (let i=0; i<questions.length; i++) {
@@ -118,6 +140,18 @@ function wordCloud(selector) {
                 .style('fill-opacity', 1e-6)
                 .attr('font-size', 1)
                 .remove();
+
+        // wait until exit transition finished, then check if all words were drawn
+        setTimeout(function() {
+            let fontsizeWarning = document.getElementById('fontsize-warning')
+            console.log(document.querySelectorAll('text').length)
+            console.log(questions.length)
+            if (document.querySelectorAll('text').length != questions.length) {
+                fontsizeWarning.classList.remove('invisible')
+            } else {
+                fontsizeWarning.classList.add('invisible')
+            }
+        }, 500)
     }
 
 

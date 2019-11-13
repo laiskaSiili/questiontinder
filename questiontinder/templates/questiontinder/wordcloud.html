@@ -25,11 +25,13 @@
         {{topic_dropdown.topic|as_crispy_field}}
     </div>
     <div class="text-right">
-        <span id="text_plus" class="p-1 cursor-pointer noselect"><i class="far fa-plus-square"></i></span>
-        <span id="text_minus" class="p-1 cursor-pointer noselect"><i class="far fa-minus-square"></i></span>
+        <span id="text_plus" class="p-1 bg-white cursor-pointer noselect"><i class="far fa-plus-square"></i></span>
+        <span id="text_minus" class="p-1 bg-white cursor-pointer noselect"><i class="far fa-minus-square"></i></span>
+    </div>
+    <div>
+        <p id="fontsize-warning" class="invisible bg-white text-danger"><small>Not all words are displayed! Reduce font size.</small></p>
     </div>
 </div>
 <div id="wordcloud">
-
 </div>
 {% endblock %}

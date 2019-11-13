@@ -23,3 +23,15 @@
               user-select: none; /* Non-prefixed version, currently
                                     supported by Chrome, Opera and Firefox */
   }
+
+#fontsize-warning {
+    -webkit-transition: opacity 0.25s linear;
+    -moz-transition: opacity 0.25s linear;
+    -ms-transition: opacity 0.25s linear;
+    -o-transition: opacity 0.25s linear;
+    transition: opacity 0.25s linear;
+}
+
+.invisible {
+    opacity: 0;
+}
