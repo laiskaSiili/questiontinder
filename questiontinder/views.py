@@ -2,10 +2,12 @@ from django.shortcuts import render, redirect, reverse
 from django.http import JsonResponse
 from django.views import View
 from django.contrib.sessions.models import Session
+from django.utils import timezone
 from .forms import QuestionAddForm, TopicDropdownForm
 from .models import Question
 from random import shuffle
 import json
+from datetime import timedelta
 
 
 class Swipe(View):
@@ -105,6 +107,8 @@ class AdminView(View):
 
 class Wordcloud(View):
 
+    TIME_DELAY_SECONDS = 30
+
     def get(self, request):
         ctx = {}
         ctx['topic_dropdown'] = TopicDropdownForm()
@@ -113,7 +117,7 @@ class Wordcloud(View):
     def post(self, request):
         request_data = json.loads(request.body)
         topic_id = int(request_data.get('topic_id'))
-        questions = list(Question.objects.all().filter(topic_id=topic_id).order_by('-votes').values('question', 'votes'))
+        questions = list(Question.objects.all().filter(topic_id=topic_id).filter(added__lt=timezone.now() - timedelta(seconds=Wordcloud.TIME_DELAY_SECONDS)).order_by('-votes').values('question', 'votes'))
         # questions = [{'text': q['question'], 'size': q['votes']} for q in questions]
         data = {
             'status': 'OK',
@@ -130,9 +134,27 @@ class Control(View):
         return render(request, 'questiontinder/control.html', ctx)
 
     def post(self, request):
-        questions = list(Question.objects.all().select_related('topic__name').order_by('-votes').values_list('votes','question', 'topic__name', 'id'))
+
+        if request.body:
+            request_data = json.loads(request.body)
+            if request_data.get('action') == 'delete_question':
+                question_id = int(request_data.get('question_id'))
+                Question.objects.get(id=question_id).delete()
+                data = {
+                    'status': 'OK',
+                    'question_id': question_id
+                }
+                return JsonResponse(data)
+
+        questions = list(Question.objects.all().select_related('topic__name').values('added', 'votes', 'question', 'topic__name', 'id'))
+        now = timezone.now()
+        data = []
+        for q in questions:
+            time_delta = now - q['added']
+            delete = f'<button id="{q["id"]}" class="btn btn-danger delete-question">delete</button>'
+            data.append((time_delta.seconds, q['votes'], q['question'], q['topic__name'], q['id'], delete))
         data = {
             'status': 'OK',
-            'data': questions,
+            'data': data,
         }
         return JsonResponse(data)

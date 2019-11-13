@@ -5,7 +5,7 @@ console.log('control')
 $(document).ready(function() {
     var csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value
     var datatable = $('#questions-datatable').DataTable({
-        "order": [[ 0, "desc" ]],
+        "order": [[ 0, "asc" ]],
         "ajax": {
             'url': '',
             'type': 'POST',
@@ -14,8 +14,27 @@ $(document).ready(function() {
             }
         },
     });
+
     setInterval( function () {
         console.log('data refresh')
         datatable.ajax.reload( null, false ); // user paging is not reset on reload
-    }, 4000 );
+    }, 5000 );
+
+    document.querySelector('table').addEventListener('click', function(e) {
+        if (!e.target.classList.contains('delete-question')) return
+
+        let payload = {
+            'action': 'delete_question',
+            'question_id': e.target.id
+        }
+        post('', payload, deleteQuestionProcessResponse, displayError)
+    })
+
+    function deleteQuestionProcessResponse(response) {
+        let questionId = response['question_id']
+        let btn = document.getElementById(questionId)
+        btn.disabled = true
+        btn.value = 'deleted'
+        console.log('question ' + questionId + ' deleted')
+    }
 } );
