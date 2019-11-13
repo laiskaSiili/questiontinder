@@ -18,9 +18,9 @@ class QuestionAddForm(forms.ModelForm):
         fields = ('topic', 'question',)
         widgets = {
             'question': forms.Textarea(attrs={
-                'rows':6,
+                'rows':2,
                 'cols':20,
-                'placeholder': 'Ask a question here...'
+                'placeholder': 'Ask here... (40 characters max)'
                 }),
         }
         labels = {
