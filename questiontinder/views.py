@@ -117,6 +117,7 @@ class Wordcloud(View):
         # questions = [{'text': q['question'], 'size': q['votes']} for q in questions]
         data = {
             'status': 'OK',
+            'topicId': topic_id,
             'questions': questions,
         }
         return JsonResponse(data)

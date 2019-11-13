@@ -5,12 +5,26 @@
 
 // Encapsulate the word cloud functionality
 
-var container = document.getElementById('wordcloud')
-var bbox = container.getBoundingClientRect()
+var bbox = document.getElementById('wordcloud').getBoundingClientRect()
 var width = bbox.width
 var height = bbox.height
-var seed, topic_id, refreshIntervallHandler, fontSizeScale
+var seed, topicId, refreshIntervallHandler, fontSizeScale
 var refreshIntervallMs = 5000
+var maxFontsizePx = width / 20
+var questions
+var myWordCloud = wordCloud('#wordcloud')
+
+document.getElementById('text_plus').addEventListener('click', function(e) {
+    maxFontsizePx += 5;
+    seed = topicId
+    updateWordcloud(questions)
+})
+
+document.getElementById('text_minus').addEventListener('click', function(e) {
+    maxFontsizePx -= 5;
+    seed = topicId
+    updateWordcloud(questions)
+})
 
 Math.random = function() {
     if (seed === undefined) {
@@ -20,14 +34,11 @@ Math.random = function() {
     return x - Math.floor(x);
 }
 
-//Create a new instance of the word cloud visualisation.
-var myWordCloud = wordCloud('#wordcloud');
-
 document.querySelector('#topic-dropdown select').addEventListener('change', function(e) {
-    topic_id = e.target.options[e.target.selectedIndex].value
+    topicId = e.target.options[e.target.selectedIndex].value
     clearInterval(refreshIntervallHandler)
-    if (topic_id) {
-        post('', {'topic_id': topic_id}, updateWordcloud, displayError)
+    if (topicId) {
+        post('', {'topic_id': topicId}, processResponse, displayError)
         startPeriodicRefresh()
     } else {
         myWordCloud.update([])
@@ -36,29 +47,28 @@ document.querySelector('#topic-dropdown select').addEventListener('change', func
 
 function startPeriodicRefresh() {
     refreshIntervallHandler = setInterval(function() {
-        console.log('refresh ' + topic_id)
-        post('', {'topic_id': topic_id}, updateWordcloud, displayError)
+        console.log('refresh ' + topicId)
+        post('', {'topic_id': topicId}, processResponse, displayError)
     }, refreshIntervallMs)
 }
 
-function updateWordcloud(response) {
-    let questions = response['questions']
+function processResponse(response) {
+    seed = response['topicId']
+    questions = response['questions']
+    updateWordcloud(questions)
+}
+
+function updateWordcloud(questions) {
+
+    let maxVotes = Math.max.apply(Math, questions.map(function(item) { return item.votes; }))
+    let minVotes = Math.min.apply(Math, questions.map(function(item) { return item.votes; }))
+    fontSizeScale = d3.scale.linear().domain([minVotes,maxVotes]).range([0.1, 1]);
+
     let wordcloudData = []
-    let question, votes, size, minVotes, maxVotes
-
-    seed = topic_id
-
-    maxVotes = Math.max.apply(Math, questions.map(function(item) { return item.votes; }))
-    minVotes = Math.min.apply(Math, questions.map(function(item) { return item.votes; }))
-
-    //fontSizeScale = d3.scale.linear().domain([minVotes,maxVotes]).range([20, 100]);
-
     for (let i=0; i<questions.length; i++) {
-        question = questions[i].question
-        votes = questions[i].votes
         wordcloudData.push({
-            'text': question,
-            'size': votes * 20
+            'text': questions[i].question,
+            'size': fontSizeScale(questions[i].votes) * maxFontsizePx
         })
     }
 
@@ -71,9 +81,9 @@ function wordCloud(selector) {
     var fill = d3.scale.category20();
 
     //Construct the word cloud's SVG element
-    var svg = d3.select(selector).append("svg")
-        .attr("width", width)
-        .attr("height", height)
+     svg = d3.select(selector).append("svg")
+        .attr("width", "100%")
+        .attr("height", "100%")
         .append("g")
         .attr("transform", "translate(" + Math.floor(width/2) + "," + Math.floor(height/2) + ")")
 
@@ -95,8 +105,7 @@ function wordCloud(selector) {
         cloud
             .transition()
                 .duration(600)
-                //.style("font-size", function(d){ return fontSizeScale(d.size) + '%' })
-                .style("font-size", function(d) { return d.size + "px"; })
+                .attr("font-size", function(d) { return d.size })
                 .attr("transform", function(d) {
                     return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
                 })
@@ -127,7 +136,7 @@ function wordCloud(selector) {
                 .rotate(function() { return 0})
                 //.rotate(function() { return ~~(Math.random() * 2) * 90; })
                 .font("Impact")
-                .fontSize(function(d) { return d.size; })
+                .fontSize(function(d) { return d.size })
                 .on("end", draw)
                 .start();
         }

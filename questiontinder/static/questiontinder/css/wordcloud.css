@@ -10,24 +10,16 @@
     z-index: 2;
 }
 
-/*
-@media (min-width: 300px) {
-    #wordcloud svg { font-size: 12px; }
+.cursor-pointer {
+    cursor: pointer;
 }
 
-@media (min-width: 500px) {
-    #wordcloud svg { font-size: 20px; }
-}
-
-@media (min-width: 720px) {
-    #wordcloud svg { font-size: 28px; }
-}
-
-@media (min-width: 1200px) {
-    #wordcloud svg { font-size: 36px; }
-}
-
-@media (min-width: 1400px) {
-    #wordcloud svg { font-size: 42px; }
-}
-*/
+.noselect {
+    -webkit-touch-callout: none; /* iOS Safari */
+      -webkit-user-select: none; /* Safari */
+       -khtml-user-select: none; /* Konqueror HTML */
+         -moz-user-select: none; /* Old versions of Firefox */
+          -ms-user-select: none; /* Internet Explorer/Edge */
+              user-select: none; /* Non-prefixed version, currently
+                                    supported by Chrome, Opera and Firefox */
+  }
