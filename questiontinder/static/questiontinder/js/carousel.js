@@ -202,10 +202,10 @@ class Carousel {
         if (this.verbose) console.log('addLastCard')
         let questions = [{
             'id':'last' + Math.floor(Math.random() * 1000),
-            'question': 'There are currently no more questions to swipe. Try again a little later or add one of your own!',
+            'question': 'There are currently no questions. Wait a little or add one of your own!',
             'class': 'last-card'
         }]
-        this.addQuestionsToBoard(questions)
+        this.addQuestionsToBoard(questions, false)
     }
 
     removeLastCard() {
@@ -219,7 +219,7 @@ class Carousel {
         let questions = response['questions']
         if (this.verbose) console.log('fetchNewQuestionsSuccess')
         if (this.verbose) console.log(questions)
-        this.addQuestionsToBoard(questions)
+        this.addQuestionsToBoard(questions, true)
         if (questions.length > 0) {
             this.stopPeriodicFetch()
             this.removeLastCard()
@@ -243,13 +243,16 @@ class Carousel {
         clearInterval(this.fetchIntervallHandler)
     }
 
-    addQuestionsToBoard(questions) {
+    addQuestionsToBoard(questions, animate=false) {
         if (this.verbose) console.log('addQuestionsToBoard')
         if (this.verbose) console.log(questions)
         for (let i=0; i<questions.length; i++) {
             let question = questions[i];
             let card = document.createElement('div')
             card.className = 'card p-4'
+            if (animate) {
+                card.style.opacity = '0'
+            }
             if (question.class !== undefined) {
                 card.classList.add(question.class)
             }
@@ -267,6 +270,10 @@ class Carousel {
             } else {
                 this.board.append(card)
             }
+
+            setTimeout(function() {
+                card.style.opacity = '1'
+            }, 100)
         }
     }
 }
