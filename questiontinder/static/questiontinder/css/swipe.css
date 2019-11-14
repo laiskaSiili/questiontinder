@@ -11,7 +11,10 @@
     height: 100vh;
     position: relative;
     overflow: hidden;
-    background-color: rgb(245,247,250);
+}
+
+#background {
+    z-index: -1;
 }
 
 .card {
@@ -38,7 +41,7 @@
     transition: opacity 0.25s linear;
 }
 
-.card-overlay {
+.swipeable-overlay {
     position: absolute;
     top: 50%;
     left: 50%;

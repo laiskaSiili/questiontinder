@@ -14,22 +14,23 @@ class Carousel {
         this.board = element
 
         this.blockSwipe = true
-        this.addLastCard()
 
         let jsVariables = JSON.parse(document.getElementById('jsVariables').textContent);
         this.voteQuestionUrl = jsVariables['vote_questions_url']
         this.fetchQuestionsUrl = jsVariables['fetch_questions_url']
 
         // fetch questions
-        this.fetchNewQuestions(true)
-        this.startPeriodicFetch()
+        setTimeout(function() {
+            this.fetchNewQuestions(true)
+            this.startPeriodicFetch()
+        }.bind(this), 2000)
     }
 
     handle() {
         if (this.verbose) console.log('handle')
 
         // list all cards
-        this.cards = this.board.querySelectorAll('.card')
+        this.cards = this.board.querySelectorAll('.swipeable')
 
         // get top card
         this.topCard = this.cards[this.cards.length - 1]
@@ -41,7 +42,7 @@ class Carousel {
             // set default top card position and scale
             this.topCard.style.transform = 'translateX(-50%) translateY(-50%) rotate(0deg) rotateY(0deg) scale(1)'
             // get overlay
-            this.topCardOverlay = this.topCard.querySelector('.card-overlay')
+            this.topCardOverlay = this.topCard.querySelector('.swipeable-overlay')
             // destroy previous Hammer instance, if present
             if (this.hammer) this.hammer.destroy()
             // listen for tap and pan gestures on top card
@@ -51,7 +52,7 @@ class Carousel {
             this.hammer.on('pan', (e) => { this.onPan(e) })
         }
 
-        if (this.topCard !== undefined && this.topCard.classList.contains('last-card') && !this.blockSwipe) {
+        if (this.topCard === undefined && !this.blockSwipe) {
             if (this.verbose) console.log('blockSwipe = true')
             this.blockSwipe = true
             this.startPeriodicFetch()
@@ -144,7 +145,7 @@ class Carousel {
                     this.board.removeChild(this.topCard)
                     // check if a new fetch must be triggered
                     if (this.cards.length < this.fetchTriggerNr) {
-                        this.addLastCard()
+                        //this.addLastCard()
                         this.fetchNewQuestions(false)
                     }
                     // reassign handle to new top card
@@ -198,23 +199,6 @@ class Carousel {
         this.post(this.fetchQuestionsUrl, data, this.fetchNewQuestionsSuccess.bind(this), displayError)
     }
 
-    addLastCard() {
-        if (this.verbose) console.log('addLastCard')
-        let questions = [{
-            'id':'last' + Math.floor(Math.random() * 1000),
-            'question': 'There are currently no questions. Wait a little or add one of your own!',
-            'class': 'last-card'
-        }]
-        this.addQuestionsToBoard(questions, false)
-    }
-
-    removeLastCard() {
-        if (this.verbose) console.log('removeLastCard')
-        Array.from(document.querySelectorAll('.last-card')).forEach(function(el) {
-            el.parentNode.removeChild(el)
-        })
-    }
-
     fetchNewQuestionsSuccess(response) {
         let questions = response['questions']
         if (this.verbose) console.log('fetchNewQuestionsSuccess')
@@ -222,11 +206,7 @@ class Carousel {
         this.addQuestionsToBoard(questions, true)
         if (questions.length > 0) {
             this.stopPeriodicFetch()
-            this.removeLastCard()
             this.blockSwipe = false
-        }
-        if (questions.length == 1) {
-            this.addLastCard()
         }
         this.handle()
     }
@@ -249,10 +229,9 @@ class Carousel {
         for (let i=0; i<questions.length; i++) {
             let question = questions[i];
             let card = document.createElement('div')
-            card.className = 'card p-4'
-            if (animate) {
-                card.style.opacity = '0'
-            }
+            card.className = 'card swipeable p-4'
+            card.style.opacity = animate ? 0 : 1
+
             if (question.class !== undefined) {
                 card.classList.add(question.class)
             }
@@ -261,7 +240,7 @@ class Carousel {
 
             // create thumbs overlay elements
             let thumbsUpOverlay = document.createElement('i')
-            thumbsUpOverlay.className = 'card-overlay far fa-10x'
+            thumbsUpOverlay.className = 'swipeable-overlay far fa-10x'
             thumbsUpOverlay.style.opacity = 0
             card.appendChild(thumbsUpOverlay)
 
@@ -272,7 +251,7 @@ class Carousel {
             }
 
             setTimeout(function() {
-                card.style.opacity = '1'
+                card.style.opacity = 1
             }, 100)
         }
     }
