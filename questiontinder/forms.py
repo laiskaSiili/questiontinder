@@ -1,5 +1,5 @@
 from django import forms
-from .models import Question
+from .models import Question, Topic
 
 
 class TopicDropdownForm(forms.ModelForm):
@@ -11,6 +11,11 @@ class TopicDropdownForm(forms.ModelForm):
             'topic': '',
         }
 
+    def __init__(self, *args, **kwargs):
+        super(TopicDropdownForm, self).__init__(*args, **kwargs)
+        self.fields['topic'].queryset = Topic.objects.all().filter(active=True)
+
+
 class QuestionAddForm(forms.ModelForm):
 
     class Meta:
@@ -20,13 +25,17 @@ class QuestionAddForm(forms.ModelForm):
             'question': forms.Textarea(attrs={
                 'rows':2,
                 'cols':20,
-                'placeholder': 'Ask here... (40 characters max)'
+                'placeholder': 'Your question... (40 characters max)'
                 }),
         }
         labels = {
             'question': '',
             'topic': 'Slammer',
         }
+
+    def __init__(self, *args, **kwargs):
+        super(QuestionAddForm, self).__init__(*args, **kwargs)
+        self.fields['topic'].queryset = Topic.objects.all().filter(active=True)
 
     def clean(self):
         cleaned_data = super().clean()
