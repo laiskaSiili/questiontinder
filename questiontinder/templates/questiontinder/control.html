@@ -2,14 +2,21 @@
 {% load static %}
 
 {% block css %}
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/css/bootstrap.css">
+<!--
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/css/bootstrap.css">
+-->
 <link rel="stylesheet" href="https://cdn.datatables.net/1.10.20/css/dataTables.bootstrap4.min.css">
+<link rel="stylesheet" href="{% static 'questiontinder/css/control.css' %}">
 {% endblock %}
 
 {% block js %}
 
-<!-- Resources -->
+<!-- Jquery -->
 <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+<!-- Bootstrap -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+<!-- Data tables -->
 <script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js"></script>
 <!-- local -->
@@ -24,22 +31,23 @@
 <div class="container">
     <div class="row my-3">
         <div class="col">
-            <table id="questions-datatable" class="table table-striped table-bordered" style="width:100%">
-                <thead>
-                    <tr>
-                        <th>Since [s]</th>
-                        <th>Votes</th>
-                        <th>Questions</th>
-                        <th>Topic</th>
-                        <th>Id</th>
-                        <th>Delete</th>
-                    </tr>
-                </thead>
-                <tbody>
-                </tbody>
-            </table>
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="nav-item">
+                <a class="nav-link active" id="question-tab" data-toggle="tab" href="#question" role="tab">Questions</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="topic-tab" data-toggle="tab" href="#topic" role="tab" aria-controls="topic">Topics</a>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <div class="tab-pane fade show active p-3" id="question" role="tabpanel" aria-labelledby="question-tab">
+                    {% include 'questiontinder/includes/control_questiontable.html' %}
+                </div>
+                <div class="tab-pane fade p-3" id="topic" role="tabpanel" aria-labelledby="topic-tab">
+                    {% include 'questiontinder/includes/control_topictable.html' %}
+                </div>
+            </div>
         </div>
     </div>
 </div>
-
 {% endblock %}

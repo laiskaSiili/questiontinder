@@ -5,7 +5,7 @@ from django.contrib.sessions.models import Session
 from django.utils import timezone
 from .decorators import superuser_required
 from .forms import QuestionAddForm, TopicDropdownForm
-from .models import Question
+from .models import Question, Topic
 from random import shuffle
 import json
 from datetime import timedelta
@@ -56,12 +56,12 @@ class ApiGetQuestions(View):
         if request_data.get('clear_prefetched'):
             prefetched_questions_ids = []
         to_exclude = prefetched_questions_ids + questions_voted_ids
-        questions = list(Question.objects.all().exclude(id__in=to_exclude).exclude(topic__frozen=True).values('id', 'question'))
-        questions = questions[:10]
+        questions = list(Question.objects.all().exclude(id__in=to_exclude).filter(topic__active=True).values('id', 'question'))
+        questions = questions[:5]
         shuffle(questions)
 
         request.session['prefetched_questions_ids'] = prefetched_questions_ids + [question['id'] for question in questions]
-        request.session.set_expiry(3600)
+        request.session.set_expiry(36000)
 
         data = {
             'status': 'OK',
@@ -80,7 +80,7 @@ class ApiVoteQuestion(View):
         questions_voted_ids_set = set(questions_voted_ids)
         if question_id not in questions_voted_ids:
             request.session['questions_voted_ids'] = questions_voted_ids + [question_id]
-            request.session.set_expiry(3600)
+            request.session.set_expiry(36000)
             if upvote_flag:
                 question = Question.objects.get(id=question_id)
                 question.votes += 1
@@ -92,24 +92,9 @@ class ApiVoteQuestion(View):
         return JsonResponse(data)
 
 
-@superuser_required()
-class AdminView(View):
-
-    def get(self, request):
-        ctx = {}
-        return render(request, 'questiontinder/adminview.html', ctx)
-
-    def post(self, request):
-        if 'reset' in request.POST:
-            print('SESSIONS DELETED')
-            Session.objects.all().delete()
-            #Question.objects.all().delete()
-        return redirect('swipe')
-
-
 class Wordcloud(View):
 
-    TIME_DELAY_SECONDS = 10
+    TIME_DELAY_SECONDS = 5
 
     def get(self, request):
         ctx = {}
@@ -134,6 +119,7 @@ class Control(View):
 
     def get(self, request):
         ctx = {}
+        ctx['topics'] = Topic.objects.all()
         return render(request, 'questiontinder/control.html', ctx)
 
     def post(self, request):
@@ -149,12 +135,45 @@ class Control(View):
                 }
                 return JsonResponse(data)
 
+            if request_data.get('action') == 'toggle_active':
+                topic_id = int(request_data.get('topic_id'))
+                topic = Topic.objects.get(id=topic_id)
+                topic.active = not topic.active
+                topic.save()
+                data = {
+                    'status': 'OK',
+                    'topic_id': topic.id,
+                    'active': topic.active,
+                }
+                return JsonResponse(data)
+
+            if request_data.get('action') == 'reset_votes':
+                topic_id = int(request_data.get('topic_id'))
+                questions = Question.objects.filter(topic_id=topic_id)
+                questions.update({'votes': 0})
+                data = {
+                    'status': 'OK',
+                    'topic_id': topic_id,
+                }
+                return JsonResponse(data)
+
+            if request_data.get('action') == 'delete_all':
+                topic_id = int(request_data.get('topic_id'))
+                questions = Question.objects.filter(topic_id=topic_id)
+                questions.delete()
+                Session.objects.all().delete()
+                data = {
+                    'status': 'OK',
+                    'topic_id': topic_id,
+                }
+                return JsonResponse(data)
+
         questions = list(Question.objects.all().select_related('topic__name').values('added', 'votes', 'question', 'topic__name', 'id'))
         now = timezone.now()
         data = []
         for q in questions:
             time_delta = now - q['added']
-            delete = f'<button id="{q["id"]}" class="btn btn-danger delete-question">delete</button>'
+            delete = f'<button id="deletequestion_{q["id"]}" class="btn btn-secondary delete-question">Remove</button>'
             data.append((time_delta.seconds, q['votes'], q['question'], q['topic__name'], q['id'], delete))
         data = {
             'status': 'OK',

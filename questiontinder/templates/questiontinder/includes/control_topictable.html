@@ -1,0 +1,26 @@
+<table id="topics-datatable" class="table table-striped table-bordered" style="width:100%">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Active</th>
+            <th>Reset votes</th>
+            <th>Delete questions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for topic in topics %}
+        <tr>
+            <td>{{topic.name}}</td>
+            <td>
+                <input id="toggleactive_{{topic.id}}" class="toggle-active" type="checkbox" {% if topic.active %}checked{% endif %}>
+            </td>
+            <td>
+                <button id="resetvotes_{{topic.id}}" class="reset-votes btn btn-secondary" type="button">Reset</button>
+            </td>
+            <td>
+                <button id="deleteall_{{topic.id}}" class="delete-all btn btn-secondary" type="button">Delete all</button>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
