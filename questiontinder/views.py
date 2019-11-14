@@ -3,6 +3,7 @@ from django.http import JsonResponse
 from django.views import View
 from django.contrib.sessions.models import Session
 from django.utils import timezone
+from .decorators import superuser_required
 from .forms import QuestionAddForm, TopicDropdownForm
 from .models import Question
 from random import shuffle
@@ -91,6 +92,7 @@ class ApiVoteQuestion(View):
         return JsonResponse(data)
 
 
+@superuser_required()
 class AdminView(View):
 
     def get(self, request):
@@ -107,7 +109,7 @@ class AdminView(View):
 
 class Wordcloud(View):
 
-    TIME_DELAY_SECONDS = 30
+    TIME_DELAY_SECONDS = 10
 
     def get(self, request):
         ctx = {}
@@ -127,6 +129,7 @@ class Wordcloud(View):
         return JsonResponse(data)
 
 
+@superuser_required()
 class Control(View):
 
     def get(self, request):
