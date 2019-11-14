@@ -6,6 +6,7 @@ $(document).ready(function() {
     var csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value
     var datatable = $('#questions-datatable').DataTable({
         "order": [[ 0, "asc" ]],
+        "responsive": true,
         "ajax": {
             'url': '',
             'type': 'POST',
