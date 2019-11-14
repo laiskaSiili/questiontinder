@@ -12,7 +12,7 @@ class Question(models.Model):
 
 class Topic(models.Model):
     name = models.CharField(null=False, blank=False, max_length=20)
-    frozen = models.BooleanField(default=False)
+    active = models.BooleanField(default=True)
 
     def __str__(self):
         return self.name

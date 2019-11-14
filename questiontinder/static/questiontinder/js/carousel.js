@@ -203,7 +203,7 @@ class Carousel {
         let questions = response['questions']
         if (this.verbose) console.log('fetchNewQuestionsSuccess')
         if (this.verbose) console.log(questions)
-        this.addQuestionsToBoard(questions, true)
+        this.addQuestionsToBoard(questions)
         if (questions.length > 0) {
             this.stopPeriodicFetch()
             this.blockSwipe = false
@@ -223,14 +223,15 @@ class Carousel {
         clearInterval(this.fetchIntervallHandler)
     }
 
-    addQuestionsToBoard(questions, animate=false) {
+    addQuestionsToBoard(questions) {
         if (this.verbose) console.log('addQuestionsToBoard')
         if (this.verbose) console.log(questions)
         for (let i=0; i<questions.length; i++) {
             let question = questions[i];
             let card = document.createElement('div')
             card.className = 'card swipeable p-4'
-            card.style.opacity = animate ? 0 : 1
+            card.style.opacity = this.questions ? 0 : 1 //??????????????
+
 
             if (question.class !== undefined) {
                 card.classList.add(question.class)
