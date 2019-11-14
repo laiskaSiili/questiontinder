@@ -34,7 +34,6 @@ $(document).ready(function() {
         let questionId = response['question_id']
         let btn = document.getElementById(questionId)
         btn.disabled = true
-        btn.value = 'deleted'
         console.log('question ' + questionId + ' deleted')
     }
 } );
